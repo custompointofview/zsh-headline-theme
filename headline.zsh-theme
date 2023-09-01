@@ -157,7 +157,8 @@ HEADLINE_RPROMPT=''
 # Clock (prepends to RPROMPT)
 HEADLINE_DO_CLOCK=true # whether to show the clock
 HEADLINE_STYLE_CLOCK=$faint
-HEADLINE_CLOCK_FORMAT='%l:%M:%S %p' # consider "%+" for full date (see man strftime)
+HEADLINE_CLOCK_FORMAT='%+' # consider "%+" for full date (see man strftime)
+# HEADLINE_CLOCK_FORMAT='%l:%M:%S %p' # consider "%+" for full date (see man strftime)
 
 # Exit code
 HEADLINE_DO_ERR=true # whether to show non-zero exit codes above prompt
