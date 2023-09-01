@@ -94,7 +94,7 @@ HEADLINE_PATH_TO_BRANCH=' | ' # only used when no padding between <path> and <br
 HEADLINE_PATH_TO_PAD='' # used if padding between <path> and <branch>
 HEADLINE_PAD_TO_BRANCH='' # used if padding between <path> and <branch>
 HEADLINE_BRANCH_TO_STATUS=' ['
-HEADLINE_STATUS_TO_STATUS='' # between each status section, consider "]"
+HEADLINE_STATUS_TO_STATUS='|' # between each status section, consider "]"
 HEADLINE_STATUS_END=']'
 
 # Info padding character
@@ -118,7 +118,7 @@ HEADLINE_INFO_MODE=precmd # precmd|prompt (whether info line is in PROMPT or pri
   # use "prompt" for Ctrl+L to clear properly (but window resize eats previous output)
 
 # Separator options
-HEADLINE_LINE_MODE=on # on|auto|off (whether to print the line above the prompt)
+HEADLINE_LINE_MODE=off # on|auto|off (whether to print the line above the prompt)
 
 # Separator character
 HEADLINE_LINE_CHAR='_' # repeated for line above information
@@ -147,7 +147,7 @@ HEADLINE_GIT_CONFLICTS='✘' # consider "%{$red%}✘"
 HEADLINE_GIT_CLEAN='' # consider "✓" or "✔"
 
 # Git status options
-HEADLINE_DO_GIT_STATUS_COUNTS=false # set "true" to show count of each status
+HEADLINE_DO_GIT_STATUS_COUNTS=true # set "true" to show count of each status
 HEADLINE_DO_GIT_STATUS_OMIT_ONE=false # set "true" to omit the status number when it is 1
 
 # Prompt
@@ -155,12 +155,12 @@ HEADLINE_PROMPT='%(#.#.%(!.!.$)) ' # consider "%#"
 HEADLINE_RPROMPT=''
 
 # Clock (prepends to RPROMPT)
-HEADLINE_DO_CLOCK=false # whether to show the clock
+HEADLINE_DO_CLOCK=true # whether to show the clock
 HEADLINE_STYLE_CLOCK=$faint
 HEADLINE_CLOCK_FORMAT='%l:%M:%S %p' # consider "%+" for full date (see man strftime)
 
 # Exit code
-HEADLINE_DO_ERR=false # whether to show non-zero exit codes above prompt
+HEADLINE_DO_ERR=true # whether to show non-zero exit codes above prompt
 HEADLINE_DO_ERR_INFO=true # whether to show exit code meaning as well
 HEADLINE_ERR_PREFIX='→ '
 HEADLINE_STYLE_ERR=$italic$faint
@@ -437,14 +437,16 @@ headline_precmd() {
   fi
 
   # Padding
-  if (( ${#branch_str} && ${#path_str} && $_HEADLINE_LEN_REMAIN <= ${#HEADLINE_PATH_TO_BRANCH} )); then
+  if (( ${#branch_str} && ${#path_str} )); then
     _headline_part JOINT "$HEADLINE_PATH_TO_BRANCH" left
   else
     if (( ${#branch_str} )); then
       _headline_part JOINT "$HEADLINE_PAD_TO_BRANCH" right
     fi
     _headline_part JOINT "$HEADLINE_PATH_TO_PAD" left
-    _headline_part JOINT "$(headline_repeat_char $HEADLINE_PAD_CHAR $_HEADLINE_LEN_REMAIN)" left
+    if (( ${HEADLINE_PAD_CHAR} )); then
+      _headline_part JOINT "$(headline_repeat_char $HEADLINE_PAD_CHAR $_HEADLINE_LEN_REMAIN)" left
+    fi
   fi
 
   # Error line
