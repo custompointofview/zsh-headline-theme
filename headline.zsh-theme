@@ -73,6 +73,7 @@ IS_SSH=$? # 0=true, 1=false
 # The style aliases for ANSI SGR codes (defined above) can be used there too
 
 # Info sources (enclose in single quotes as these will be eval'd, use empty string to hide segment)
+HEADLINE_PYENV_CMD='basename "$VIRTUAL_ENV"'
 HEADLINE_USER_CMD='echo $USER'
 HEADLINE_HOST_CMD='hostname -s' # consider 'basename "$VIRTUAL_ENV"' to replace host with environment
 HEADLINE_PATH_CMD='print -rP "%~"'
@@ -86,6 +87,9 @@ HEADLINE_PATH_PREFIX='' # consider " "
 HEADLINE_BRANCH_PREFIX='' # consider " "
 
 # Info joints
+HEADLINE_PYENV_START='('
+HEADLINE_PYENV_TO_USER=' '
+HEADLINE_PYENV_END=')'
 HEADLINE_USER_BEGIN=''
 if [ $IS_SSH = 0 ]; then HEADLINE_USER_BEGIN='=> '; fi
 HEADLINE_USER_TO_HOST=' @ '
@@ -106,6 +110,7 @@ HEADLINE_TRUNC_PREFIX='...' # shown where <path> or <branch> is truncated, consi
 # Info styles
 HEADLINE_STYLE_DEFAULT='' # style applied to entire info line
 HEADLINE_STYLE_JOINT=$light_black
+HEADLINE_STYLE_PYENV=$underline$bold$light_black
 HEADLINE_STYLE_USER=$bold$red
 HEADLINE_STYLE_HOST=$bold$yellow
 HEADLINE_STYLE_PATH=$bold$blue
@@ -125,6 +130,7 @@ HEADLINE_LINE_CHAR='_' # repeated for line above information
 
 # Separator styles
 HEADLINE_STYLE_JOINT_LINE=$HEADLINE_STYLE_JOINT
+HEADLINE_STYLE_PYENV_LINE=$HEADLINE_STYLE_PYENV
 HEADLINE_STYLE_USER_LINE=$HEADLINE_STYLE_USER
 HEADLINE_STYLE_HOST_LINE=$HEADLINE_STYLE_HOST
 HEADLINE_STYLE_PATH_LINE=$HEADLINE_STYLE_PATH
@@ -365,7 +371,8 @@ headline_precmd() {
   local err=$?
 
   # Information
-  local user_str host_str path_str branch_str status_str
+  local pyenv_str user_str host_str path_str branch_str status_str
+  pyenv_str=$(eval $HEADLINE_PYENV_CMD)
   user_str=$(eval $HEADLINE_USER_CMD)
   host_str=$(eval $HEADLINE_HOST_CMD)
   path_str=$(eval $HEADLINE_PATH_CMD)
@@ -414,8 +421,18 @@ headline_precmd() {
     host_str="${host_str:0:1}"
   fi
 
+  # PyEnv
+  if (( ${#pyenv_str} )); then
+    _headline_part JOINT "$HEADLINE_PYENV_START" left
+    _headline_part PYENV "$pyenv_str" left
+    _headline_part JOINT "$HEADLINE_PYENV_END" left
+  fi
+
   # User
   if (( ${#user_str} )); then
+    if (( ${#pyenv_str} )); then
+      _headline_part JOINT "$HEADLINE_PYENV_TO_USER" left
+    fi
     _headline_part JOINT "$HEADLINE_USER_BEGIN" left
     _headline_part USER "$HEADLINE_USER_PREFIX$user_str" left
   fi
